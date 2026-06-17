@@ -1,16 +1,18 @@
-# 📡 GNews — Live News Dashboard
+# 🕵️ FactCheck Live — Keyless Local Edition
 
-A sleek CLI + Web UI tool that fetches live headlines from Google News RSS feeds. Built as part of the **5-Day AI Agents Intensive Vibe Coding Course with Google**.
+A real-time **fake news detector** that fetches live headlines from Google News and uses a **local heuristic algorithm** to score each headline's credibility. Built as part of the **5-Day AI Agents Intensive Vibe Coding Course with Google**.
 
 ---
 
 ## ✨ Features
 
-- 🌐 **Web UI** — Beautiful dark-mode news dashboard
-- 💻 **CLI** — Terminal-based news fetcher
-- 🔍 **Search** — Find news on any topic
-- ⚡ **Fast** — No API key needed, powered by Google News RSS
-- 🎨 **Animated cards** with source, timestamps & links
+- 🔍 **Per-headline Fact Check** — Click "Check" on any card to analyze it locally
+- ⚡ **Check All** — Fact-check every headline in the feed at once
+- 📊 **Credibility Score (0–100)** — Animated score bar with color coding
+- 🏷️ **Verdict Badge** — ✅ Likely Real / ⚠️ Uncertain / ❌ Likely Fake
+- 🤖 **Local Engine** — 1-2 sentence reason + red flag tags generated locally (No API key needed!)
+- 📈 **Live Stats Bar** — Feed-wide average score and real/uncertain/fake breakdown
+- 🌐 **No API key for news** — Powered by Google News RSS feeds
 
 ---
 
@@ -21,23 +23,11 @@ A sleek CLI + Web UI tool that fetches live headlines from Google News RSS feeds
 npm install
 ```
 
-### 2. Run the Web UI
+### 2. Start the server
 ```bash
 node server.js
 ```
 Then open **http://localhost:3000** in your browser.
-
-### 3. Or use the CLI
-```bash
-# Top 10 headlines
-node index.js
-
-# Search a topic
-node index.js --search "Artificial Intelligence"
-
-# Limit results
-node index.js -s "crypto" -n 5
-```
 
 ---
 
@@ -45,9 +35,11 @@ node index.js -s "crypto" -n 5
 
 ```
 ├── index.js          # CLI tool (commander + chalk)
-├── server.js         # Express web server + API
+├── server.js         # Express server + /api/news + /api/fact-check
 ├── public/
-│   └── index.html    # Web UI (dark-mode dashboard)
+│   └── index.html    # Web UI — FactCheck Live dashboard
+├── .env              # Your API key (never commit this!)
+├── .env.example      # Example env file to share
 ├── demo_bad_code.py  # Python demo for AI code review
 ├── package.json
 └── .gitignore
@@ -66,12 +58,41 @@ node index.js -s "crypto" -n 5
 
 ---
 
+## 🔌 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/news` | GET | Fetch headlines (`?search=topic&limit=10`) |
+| `/api/fact-check` | POST | Fact-check a headline via local heuristics |
+
+### `/api/fact-check` example
+```json
+POST /api/fact-check
+{ "title": "Scientists discover cure for all diseases", "source": "Unknown Blog" }
+
+Response:
+{
+  "score": 12,
+  "verdict": "Likely Fake",
+  "reason": "Headline is highly sensationalist with no credible source. Such broad medical claims are extremely unlikely.",
+  "flags": ["Sensationalist language", "No credible source", "Unverifiable claim"]
+}
+```
+
+---
+
 ## 📚 Course Context
 
 This project is part of the **5-Day AI Agents Intensive Vibe Coding Course with Google**, exploring:
 - Building CLI tools with Node.js
 - Wrapping tools in a web UI
-- Extending with AI agents (Gemini API)
+- **Extending with AI agents (Gemini API)** ← You are here
+
+---
+
+## ⚠️ Disclaimer
+
+Verdicts are **probabilistic estimates**, not absolute truths. The local algorithm analyzes headline language, tone, and sources using basic heuristics. Always cross-check with multiple reputable sources.
 
 ---
 

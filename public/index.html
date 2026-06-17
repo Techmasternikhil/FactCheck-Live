@@ -3,26 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GNews — Live News Dashboard</title>
-  <meta name="description" content="A beautiful live news dashboard powered by Google News RSS feeds." />
+  <title>FactCheck Live — Local News Credibility Checker</title>
+  <meta name="description" content="Real-time fact-checker for live news headlines. Instantly detect fake news, misinformation, and credibility scores using local heuristics." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #080c14;
-      --surface: #0f1623;
-      --surface2: #151d2e;
-      --border: rgba(99, 179, 237, 0.12);
-      --accent: #3b82f6;
-      --accent2: #8b5cf6;
-      --accent3: #06b6d4;
-      --text: #e2e8f0;
-      --text-muted: #64748b;
-      --text-dim: #94a3b8;
-      --card-hover: rgba(59, 130, 246, 0.06);
-      --glow: rgba(59, 130, 246, 0.15);
+      --bg:        #060910;
+      --surface:   #0d1220;
+      --surface2:  #131929;
+      --surface3:  #1a2235;
+      --border:    rgba(99,179,237,0.10);
+      --border2:   rgba(99,179,237,0.18);
+
+      --accent:    #3b82f6;
+      --accent2:   #8b5cf6;
+      --accent3:   #06b6d4;
+
+      --real:      #22c55e;
+      --real-bg:   rgba(34,197,94,0.10);
+      --real-border:rgba(34,197,94,0.25);
+
+      --uncertain: #f59e0b;
+      --uncertain-bg: rgba(245,158,11,0.10);
+      --uncertain-border: rgba(245,158,11,0.25);
+
+      --fake:      #ef4444;
+      --fake-bg:   rgba(239,68,68,0.10);
+      --fake-border: rgba(239,68,68,0.25);
+
+      --text:      #e2e8f0;
+      --text-muted:#64748b;
+      --text-dim:  #94a3b8;
+      --glow:      rgba(59,130,246,0.18);
     }
 
     html { scroll-behavior: smooth; }
@@ -35,128 +50,166 @@
       overflow-x: hidden;
     }
 
-    /* Animated background */
+    /* === Animated Background === */
     body::before {
       content: '';
       position: fixed;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
+      inset: -50%;
+      width: 200%; height: 200%;
       background:
-        radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.07) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.07) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(6,182,212,0.04) 0%, transparent 60%);
-      animation: bgPulse 12s ease-in-out infinite alternate;
+        radial-gradient(ellipse at 15% 20%, rgba(59,130,246,0.08) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 75%, rgba(139,92,246,0.08) 0%, transparent 45%),
+        radial-gradient(ellipse at 50% 50%, rgba(6,182,212,0.04) 0%, transparent 55%);
+      animation: bgPulse 14s ease-in-out infinite alternate;
       pointer-events: none;
       z-index: 0;
     }
-
     @keyframes bgPulse {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(2%, 2%) scale(1.05); }
+      0%   { transform: translate(0,0) scale(1); }
+      100% { transform: translate(2%,2%) scale(1.06); }
     }
 
     .container {
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 0 24px;
       position: relative;
       z-index: 1;
     }
 
-    /* Header */
-    header {
-      padding: 48px 0 32px;
-      text-align: center;
-    }
+    /* === Header === */
+    header { padding: 52px 0 28px; text-align: center; }
 
     .logo {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 14px;
+      margin-bottom: 14px;
     }
 
     .logo-icon {
-      width: 48px;
-      height: 48px;
+      width: 54px; height: 54px;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 0 30px var(--glow);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 40px var(--glow), inset 0 1px 0 rgba(255,255,255,0.1);
     }
 
     .logo-text {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #60a5fa, #a78bfa, #22d3ee);
+      font-size: 2.2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #22d3ee 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.8px;
     }
 
     .tagline {
       color: var(--text-muted);
       font-size: 0.95rem;
       font-weight: 400;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
+      margin-bottom: 6px;
     }
 
-    /* Search Bar */
-    .search-section {
-      margin: 32px 0 24px;
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #a78bfa;
+      letter-spacing: 0.5px;
+      margin-top: 10px;
     }
+    .ai-dot {
+      width: 7px; height: 7px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* === Stats Bar === */
+    #stats-bar {
+      display: none;
+      gap: 10px;
+      margin: 20px 0 24px;
+      flex-wrap: wrap;
+    }
+    #stats-bar.visible { display: flex; }
+
+    .stat-pill {
+      flex: 1;
+      min-width: 120px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .stat-value.real  { color: var(--real); }
+    .stat-value.unc   { color: var(--uncertain); }
+    .stat-value.fake  { color: var(--fake); }
+    .stat-value.avg   { color: #60a5fa; }
+
+    /* === Search Section === */
+    .search-section { margin: 28px 0 18px; }
 
     .search-wrapper {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      border: 1px solid var(--border2);
+      border-radius: 18px;
       padding: 6px;
       display: flex;
       gap: 8px;
       align-items: center;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04);
+      box-shadow: 0 4px 28px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
       transition: border-color 0.3s, box-shadow 0.3s;
     }
-
     .search-wrapper:focus-within {
-      border-color: rgba(59, 130, 246, 0.4);
-      box-shadow: 0 4px 32px rgba(0,0,0,0.4), 0 0 0 3px rgba(59,130,246,0.1);
+      border-color: rgba(59,130,246,0.45);
+      box-shadow: 0 4px 36px rgba(0,0,0,0.4), 0 0 0 3px rgba(59,130,246,0.10);
     }
 
-    .search-icon {
-      padding: 0 8px 0 14px;
-      color: var(--text-muted);
-      font-size: 18px;
-      flex-shrink: 0;
-    }
+    .search-icon { padding: 0 8px 0 14px; color: var(--text-muted); font-size: 18px; flex-shrink: 0; }
 
     #search-input {
       flex: 1;
       background: transparent;
-      border: none;
-      outline: none;
+      border: none; outline: none;
       color: var(--text);
       font-size: 1rem;
       font-family: inherit;
       padding: 12px 4px;
       caret-color: var(--accent);
     }
-
     #search-input::placeholder { color: var(--text-muted); }
 
-    .controls {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-shrink: 0;
-      padding-right: 4px;
-    }
+    .controls { display: flex; gap: 8px; align-items: center; flex-shrink: 0; padding-right: 4px; }
 
     .limit-select {
       background: var(--surface2);
@@ -170,35 +223,25 @@
       cursor: pointer;
       transition: border-color 0.2s;
     }
-
     .limit-select:focus { border-color: rgba(59,130,246,0.4); }
 
     .btn-fetch {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border: none;
-      border-radius: 10px;
+      border: none; border-radius: 10px;
       color: white;
-      font-size: 0.9rem;
-      font-weight: 600;
-      font-family: inherit;
+      font-size: 0.9rem; font-weight: 600; font-family: inherit;
       padding: 10px 20px;
       cursor: pointer;
       transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
       white-space: nowrap;
-      box-shadow: 0 2px 12px rgba(59,130,246,0.3);
+      box-shadow: 0 2px 14px rgba(59,130,246,0.32);
     }
-
-    .btn-fetch:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(59,130,246,0.4); }
+    .btn-fetch:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 4px 24px rgba(59,130,246,0.45); }
     .btn-fetch:active { transform: translateY(0); }
     .btn-fetch:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    /* Quick topics */
-    .topics {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 32px;
-    }
+    /* === Quick Topics === */
+    .topics { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
 
     .topic-chip {
       background: var(--surface);
@@ -211,254 +254,375 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-
     .topic-chip:hover {
-      background: var(--card-hover);
+      background: rgba(59,130,246,0.08);
       border-color: rgba(59,130,246,0.3);
       color: #60a5fa;
       transform: translateY(-1px);
     }
 
-    /* Feed title */
+    /* === Feed Header === */
     .feed-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
-      min-height: 28px;
+      margin-bottom: 18px;
+      min-height: 36px;
     }
-
+    .feed-meta { display: flex; align-items: center; gap: 10px; }
     .feed-title {
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 0.82rem; font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-
     .feed-count {
       background: rgba(59,130,246,0.15);
       color: #60a5fa;
       border-radius: 999px;
       padding: 3px 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      font-size: 0.72rem; font-weight: 600;
     }
-
-    /* News cards */
-    #news-feed {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    .btn-check-all {
+      background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(6,182,212,0.15));
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 10px;
+      color: #4ade80;
+      font-size: 0.82rem; font-weight: 600; font-family: inherit;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: none;
+      white-space: nowrap;
     }
+    .btn-check-all.visible { display: flex; align-items: center; gap: 6px; }
+    .btn-check-all:hover {
+      background: linear-gradient(135deg, rgba(34,197,94,0.25), rgba(6,182,212,0.25));
+      border-color: rgba(34,197,94,0.5);
+      transform: translateY(-1px);
+    }
+    .btn-check-all:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
+    /* === News Feed === */
+    #news-feed { display: flex; flex-direction: column; gap: 14px; }
+
+    /* === News Card === */
     .news-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 20px 22px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      text-decoration: none;
       display: block;
       position: relative;
       overflow: hidden;
       animation: fadeSlideIn 0.4s ease both;
+      transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
     }
 
     .news-card::before {
       content: '';
       position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
+      left: 0; top: 0; bottom: 0;
       width: 3px;
       background: linear-gradient(180deg, var(--accent), var(--accent2));
       opacity: 0;
-      transition: opacity 0.25s;
+      transition: opacity 0.3s, background 0.3s;
       border-radius: 3px 0 0 3px;
     }
+    .news-card:hover { box-shadow: 0 8px 36px rgba(0,0,0,0.35); }
 
-    .news-card:hover {
-      background: var(--card-hover);
-      border-color: rgba(59,130,246,0.25);
-      transform: translateX(4px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3), -4px 0 20px rgba(59,130,246,0.05);
-    }
-
-    .news-card:hover::before { opacity: 1; }
+    /* Verdict-specific card theming */
+    .news-card.verdict-real    { border-color: var(--real-border);      background: var(--real-bg); }
+    .news-card.verdict-real::before  { opacity: 1; background: var(--real); }
+    .news-card.verdict-uncertain { border-color: var(--uncertain-border); background: var(--uncertain-bg); }
+    .news-card.verdict-uncertain::before { opacity: 1; background: var(--uncertain); }
+    .news-card.verdict-fake    { border-color: var(--fake-border);      background: var(--fake-bg); }
+    .news-card.verdict-fake::before  { opacity: 1; background: var(--fake); }
 
     @keyframes fadeSlideIn {
       from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .card-index {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      opacity: 0.7;
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
     }
-
+    .card-left { flex: 1; min-width: 0; }
+    .card-index {
+      font-size: 0.68rem; font-weight: 700;
+      color: var(--accent); letter-spacing: 1px;
+      margin-bottom: 6px; opacity: 0.7;
+    }
     .card-title {
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: 1rem; font-weight: 600;
       color: var(--text);
       line-height: 1.5;
       margin-bottom: 10px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
     }
+    .card-title a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .card-title a:hover { color: #60a5fa; }
 
     .card-meta {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
-
     .card-source {
       background: rgba(139,92,246,0.12);
       color: #a78bfa;
       border-radius: 6px;
       padding: 3px 9px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      font-size: 0.73rem; font-weight: 600;
     }
-
     .card-date {
       color: var(--text-muted);
-      font-size: 0.78rem;
+      font-size: 0.75rem;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Check button (right side of card) */
+    .btn-check {
+      background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(139,92,246,0.12));
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 10px;
+      color: #60a5fa;
+      font-size: 0.8rem; font-weight: 600; font-family: inherit;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-check:hover {
+      background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(139,92,246,0.22));
+      border-color: rgba(59,130,246,0.5);
+      transform: translateY(-1px);
+    }
+    .btn-check:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-check.checking { animation: spin-pulse 1s linear infinite; }
+    @keyframes spin-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* === Fact Result Area === */
+    .fact-result {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .fact-result.visible { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Score row */
+    .score-row {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 14px;
+      margin-bottom: 12px;
     }
-
-    .card-arrow {
-      margin-left: auto;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      opacity: 0;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-
-    .news-card:hover .card-arrow {
-      opacity: 1;
-      transform: translateX(4px);
-    }
-
-    /* States */
-    .state-box {
+    .score-number {
+      font-size: 2rem; font-weight: 900;
+      line-height: 1;
+      min-width: 52px;
       text-align: center;
-      padding: 80px 24px;
+    }
+    .score-bar-wrap {
+      flex: 1;
+      background: var(--surface3);
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .score-bar {
+      height: 100%;
+      border-radius: 999px;
+      width: 0%;
+      transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Verdict badge */
+    .verdict-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.3px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .verdict-badge.real      { background: var(--real-bg); border: 1px solid var(--real-border); color: var(--real); }
+    .verdict-badge.uncertain { background: var(--uncertain-bg); border: 1px solid var(--uncertain-border); color: var(--uncertain); }
+    .verdict-badge.fake      { background: var(--fake-bg); border: 1px solid var(--fake-border); color: var(--fake); }
+
+    /* Reason text */
+    .fact-reason {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    /* Flags */
+    .flags-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .flag-chip {
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 0.72rem; font-weight: 500;
       color: var(--text-muted);
     }
 
-    .state-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
-      display: block;
-    }
-
-    .state-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-dim);
-      margin-bottom: 8px;
-    }
-
-    .state-sub { font-size: 0.9rem; }
-
-    /* Loading animation */
-    .loading-grid {
+    /* Checking spinner inside fact-result */
+    .checking-state {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
     }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* === Skeleton === */
+    .loading-grid { display: flex; flex-direction: column; gap: 14px; }
     .skeleton {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 20px 22px;
       overflow: hidden;
       position: relative;
     }
-
     .skeleton::after {
       content: '';
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
       animation: shimmer 1.5s infinite;
     }
-
     @keyframes shimmer {
-      0% { transform: translateX(-100%); }
+      0%   { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
     }
+    .skel-line { background: var(--surface2); border-radius: 4px; margin-bottom: 10px; }
+    .skel-line.title  { height: 16px; width: 80%; }
+    .skel-line.title2 { height: 16px; width: 55%; }
+    .skel-line.meta   { height: 12px; width: 28%; margin-top: 4px; }
 
-    .skel-line {
-      background: var(--surface2);
-      border-radius: 4px;
-      margin-bottom: 10px;
+    /* === State Boxes === */
+    .state-box {
+      text-align: center;
+      padding: 90px 24px;
+      color: var(--text-muted);
     }
+    .state-icon  { font-size: 3.2rem; margin-bottom: 18px; display: block; }
+    .state-title { font-size: 1.1rem; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; }
+    .state-sub   { font-size: 0.9rem; }
 
-    .skel-line.title { height: 16px; width: 85%; }
-    .skel-line.title2 { height: 16px; width: 60%; }
-    .skel-line.meta { height: 12px; width: 30%; margin-top: 4px; }
-
-    /* Error state */
     .error-box {
       background: rgba(239,68,68,0.08);
-      border: 1px solid rgba(239,68,68,0.2);
-      border-radius: 12px;
-      padding: 20px;
+      border: 1px solid rgba(239,68,68,0.22);
+      border-radius: 14px;
+      padding: 22px;
       color: #fca5a5;
       text-align: center;
       font-size: 0.9rem;
     }
 
-    /* Footer */
+    /* === Footer === */
     footer {
       text-align: center;
-      padding: 48px 0 32px;
+      padding: 52px 0 36px;
       color: var(--text-muted);
       font-size: 0.8rem;
+      line-height: 1.8;
     }
+    footer strong { color: var(--text-dim); }
+    footer span.heart { color: #ef4444; }
 
-    footer span { color: #ef4444; }
-
-    @media (max-width: 600px) {
+    /* === Responsive === */
+    @media (max-width: 620px) {
       .search-wrapper { flex-wrap: wrap; }
       .controls { width: 100%; padding: 0 4px 4px; }
       .btn-fetch { flex: 1; }
-      .logo-text { font-size: 1.6rem; }
+      .logo-text { font-size: 1.7rem; }
+      .stat-pill { min-width: 80px; }
     }
   </style>
 </head>
 <body>
 
 <div class="container">
+  <!-- Header -->
   <header>
     <div class="logo">
-      <div class="logo-icon">📡</div>
-      <span class="logo-text">GNews</span>
+      <div class="logo-icon">🕵️</div>
+      <span class="logo-text">FactCheck Live</span>
     </div>
-    <p class="tagline">Live headlines powered by Google News · Updated in real-time</p>
+    <p class="tagline">Live news · Fast heuristic credibility scoring · Real-time fake news detection</p>
+    <div class="ai-badge">
+      <span class="ai-dot"></span>
+      Powered by Local Heuristic Engine
+    </div>
   </header>
 
+  <!-- Stats Bar -->
+  <div id="stats-bar">
+    <div class="stat-pill">
+      <div class="stat-label">Avg Score</div>
+      <div class="stat-value avg" id="stat-avg">—</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">✅ Likely Real</div>
+      <div class="stat-value real" id="stat-real">0</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">⚠️ Uncertain</div>
+      <div class="stat-value unc" id="stat-unc">0</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">❌ Likely Fake</div>
+      <div class="stat-value fake" id="stat-fake">0</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-label">Checked</div>
+      <div class="stat-value avg" id="stat-checked">0</div>
+    </div>
+  </div>
+
+  <!-- Search -->
   <section class="search-section">
     <div class="search-wrapper">
       <span class="search-icon">🔍</span>
       <input
         id="search-input"
         type="text"
-        placeholder="Search any topic — AI, crypto, sports, politics…"
+        placeholder="Search any topic — AI, politics, health, crypto…"
         autocomplete="off"
       />
       <div class="controls">
@@ -466,56 +630,76 @@
           <option value="5">5 results</option>
           <option value="10" selected>10 results</option>
           <option value="20">20 results</option>
-          <option value="50">50 results</option>
         </select>
-        <button class="btn-fetch" id="fetch-btn" onclick="fetchNews()">Fetch →</button>
+        <button class="btn-fetch" id="fetch-btn" onclick="fetchNews()">Fetch News →</button>
       </div>
     </div>
   </section>
 
+  <!-- Quick Topics -->
   <div class="topics">
     <button class="topic-chip" onclick="setSearch('Artificial Intelligence')">🤖 AI</button>
     <button class="topic-chip" onclick="setSearch('Technology')">💻 Tech</button>
     <button class="topic-chip" onclick="setSearch('Cryptocurrency')">₿ Crypto</button>
-    <button class="topic-chip" onclick="setSearch('Climate')">🌍 Climate</button>
+    <button class="topic-chip" onclick="setSearch('Climate Change')">🌍 Climate</button>
     <button class="topic-chip" onclick="setSearch('Science')">🔬 Science</button>
-    <button class="topic-chip" onclick="setSearch('Business')">📈 Business</button>
-    <button class="topic-chip" onclick="setSearch('Sports')">⚽ Sports</button>
+    <button class="topic-chip" onclick="setSearch('Politics')">🏛️ Politics</button>
+    <button class="topic-chip" onclick="setSearch('Health')">💊 Health</button>
     <button class="topic-chip" onclick="setSearch('')">🌐 Top Stories</button>
   </div>
 
+  <!-- Feed Header -->
   <div class="feed-header">
-    <span class="feed-title" id="feed-title">Top Stories</span>
-    <span class="feed-count" id="feed-count" style="display:none"></span>
+    <div class="feed-meta">
+      <span class="feed-title" id="feed-title">Ready</span>
+      <span class="feed-count" id="feed-count" style="display:none"></span>
+    </div>
+    <button class="btn-check-all" id="check-all-btn" onclick="checkAll()" id="check-all-btn">
+      🔬 Check All Headlines
+    </button>
   </div>
 
+  <!-- News Feed -->
   <div id="news-feed">
     <div class="state-box">
-      <span class="state-icon">📰</span>
-      <div class="state-title">Ready to fetch news</div>
-      <div class="state-sub">Press <strong>Fetch →</strong> or click a topic above</div>
+      <span class="state-icon">🕵️</span>
+      <div class="state-title">Fact Checker Ready</div>
+      <div class="state-sub">Press <strong>Fetch News →</strong> or click a topic to load headlines, then check them for credibility.</div>
     </div>
   </div>
 
   <footer>
-    Built with <span>♥</span> · Powered by Google News RSS &amp; rss-parser
+    <strong>FactCheck Live</strong> — Local news credibility checker<br/>
+    Built with <span class="heart">♥</span> · Google News RSS + Heuristics Engine<br/>
+    <em style="color:var(--text-muted);font-size:0.75rem">Verdicts are probabilistic estimates, not absolute — always verify with multiple sources.</em>
   </footer>
 </div>
 
 <script>
+  // ─── State ────────────────────────────────────────────────────────────────
+  let newsItems = [];
+  let checkAllRunning = false;
+  const stats = { real: 0, uncertain: 0, fake: 0, scores: [] };
+
+  // ─── Fetch News ───────────────────────────────────────────────────────────
   async function fetchNews() {
-    const query = document.getElementById('search-input').value.trim();
-    const limit = document.getElementById('limit-select').value;
-    const btn = document.getElementById('fetch-btn');
-    const feed = document.getElementById('news-feed');
-    const feedTitle = document.getElementById('feed-title');
-    const feedCount = document.getElementById('feed-count');
+    const query    = document.getElementById('search-input').value.trim();
+    const limit    = document.getElementById('limit-select').value;
+    const btn      = document.getElementById('fetch-btn');
+    const feed     = document.getElementById('news-feed');
+    const feedTitle= document.getElementById('feed-title');
+    const feedCount= document.getElementById('feed-count');
+    const checkAll = document.getElementById('check-all-btn');
 
     btn.disabled = true;
     btn.textContent = 'Loading…';
+    checkAll.classList.remove('visible');
+    feedCount.style.display = 'none';
+    resetStats();
 
-    // Show skeleton
-    feed.innerHTML = Array(parseInt(limit) > 5 ? 5 : parseInt(limit)).fill(0).map(() => `
+    // Skeleton placeholders
+    const skelCount = Math.min(parseInt(limit), 5);
+    feed.innerHTML = Array(skelCount).fill(0).map(() => `
       <div class="skeleton">
         <div class="skel-line title"></div>
         <div class="skel-line title2"></div>
@@ -527,14 +711,15 @@
       const params = new URLSearchParams({ limit });
       if (query) params.append('search', query);
 
-      const res = await fetch(`/api/news?${params}`);
+      const res  = await fetch(`/api/news?${params}`);
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
-
       if (data.error) throw new Error(data.error);
 
+      newsItems = data.items;
+
       feedTitle.textContent = data.title || (query ? `"${query}"` : 'Top Stories');
-      feedCount.textContent = `${data.items.length} articles`;
+      feedCount.textContent  = `${data.items.length} articles`;
       feedCount.style.display = 'inline';
 
       if (data.items.length === 0) {
@@ -542,58 +727,200 @@
         return;
       }
 
-      feed.innerHTML = data.items.map((item, i) => {
-        const date = item.pubDate ? formatDate(new Date(item.pubDate)) : '';
-        const source = item.source || '';
-        const title = escHtml(item.title || 'Untitled');
-        return `
-          <a class="news-card" href="${escHtml(item.link)}" target="_blank" rel="noopener" style="animation-delay:${i * 40}ms">
-            <div class="card-index">ARTICLE ${String(i + 1).padStart(2, '0')}</div>
-            <div class="card-title">${title}</div>
-            <div class="card-meta">
-              ${source ? `<span class="card-source">${escHtml(source)}</span>` : ''}
-              ${date ? `<span class="card-date">🕐 ${date}</span>` : ''}
-              <span class="card-arrow">↗</span>
-            </div>
-          </a>
-        `;
-      }).join('');
+      feed.innerHTML = data.items.map((item, i) => buildCard(item, i)).join('');
+      checkAll.classList.add('visible');
 
     } catch (err) {
       feed.innerHTML = `<div class="error-box">⚠️ ${escHtml(err.message)}</div>`;
-      feedCount.style.display = 'none';
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Fetch →';
+      btn.textContent = 'Fetch News →';
     }
   }
 
+  // ─── Build Card HTML ───────────────────────────────────────────────────────
+  function buildCard(item, i) {
+    const date   = item.pubDate ? formatDate(new Date(item.pubDate)) : '';
+    const source = item.source  || '';
+    const title  = escHtml(item.title || 'Untitled');
+    return `
+      <div class="news-card" id="card-${i}" style="animation-delay:${i * 40}ms">
+        <div class="card-top">
+          <div class="card-left">
+            <div class="card-index">ARTICLE ${String(i + 1).padStart(2, '0')}</div>
+            <div class="card-title">
+              <a href="${escHtml(item.link)}" target="_blank" rel="noopener">${title}</a>
+            </div>
+            <div class="card-meta">
+              ${source ? `<span class="card-source">${escHtml(source)}</span>` : ''}
+              ${date   ? `<span class="card-date">🕐 ${date}</span>`           : ''}
+            </div>
+          </div>
+          <button class="btn-check" id="check-btn-${i}" onclick="checkFact(${i})">
+            🔍 Check
+          </button>
+        </div>
+        <div class="fact-result" id="fact-${i}"></div>
+      </div>
+    `;
+  }
+
+  // ─── Check Single Fact ─────────────────────────────────────────────────────
+  async function checkFact(i) {
+    const item      = newsItems[i];
+    const factEl    = document.getElementById(`fact-${i}`);
+    const checkBtn  = document.getElementById(`check-btn-${i}`);
+    const cardEl    = document.getElementById(`card-${i}`);
+
+    checkBtn.disabled = true;
+    checkBtn.textContent = '⏳ Checking…';
+    factEl.className = 'fact-result visible';
+    factEl.innerHTML = `
+      <div class="checking-state">
+        <div class="spinner"></div>
+        <span>Analyzing headline using local heuristic engine…</span>
+      </div>
+    `;
+
+    try {
+      const res  = await fetch('/api/fact-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: item.title, source: item.source, pubDate: item.pubDate }),
+      });
+
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      // Determine color class
+      let cls = 'uncertain';
+      if (data.verdict === 'Likely Real') cls = 'real';
+      if (data.verdict === 'Likely Fake') cls = 'fake';
+
+      const scoreColor = data.score >= 70 ? '#22c55e' : data.score >= 40 ? '#f59e0b' : '#ef4444';
+
+      factEl.innerHTML = `
+        <div class="score-row">
+          <div class="score-number" style="color:${scoreColor}">${data.score}</div>
+          <div class="score-bar-wrap">
+            <div class="score-bar" id="bar-${i}" style="background:${scoreColor}"></div>
+          </div>
+          <div class="verdict-badge ${cls}">
+            ${data.verdict === 'Likely Real' ? '✅' : data.verdict === 'Likely Fake' ? '❌' : '⚠️'}
+            ${escHtml(data.verdict)}
+          </div>
+        </div>
+        <p class="fact-reason">${escHtml(data.reason)}</p>
+        ${data.flags?.length ? `
+          <div class="flags-row">
+            ${data.flags.map(f => `<span class="flag-chip">🏷 ${escHtml(f)}</span>`).join('')}
+          </div>
+        ` : ''}
+      `;
+
+      // Animate the score bar
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const bar = document.getElementById(`bar-${i}`);
+          if (bar) bar.style.width = `${data.score}%`;
+        });
+      });
+
+      // Apply card verdict theme
+      cardEl.classList.remove('verdict-real', 'verdict-uncertain', 'verdict-fake');
+      cardEl.classList.add(`verdict-${cls}`);
+
+      // Update stats
+      updateStats(data);
+      checkBtn.textContent = '✓ Checked';
+
+    } catch (err) {
+      factEl.innerHTML = `<div style="color:#fca5a5;font-size:0.85rem">⚠️ ${escHtml(err.message)}</div>`;
+      checkBtn.disabled = false;
+      checkBtn.textContent = '🔍 Retry';
+    }
+  }
+
+  // ─── Check All ─────────────────────────────────────────────────────────────
+  async function checkAll() {
+    if (checkAllRunning) return;
+    checkAllRunning = true;
+
+    const btn = document.getElementById('check-all-btn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Checking all…';
+
+    for (let i = 0; i < newsItems.length; i++) {
+      const checkBtn = document.getElementById(`check-btn-${i}`);
+      // Skip already checked cards
+      if (checkBtn && checkBtn.textContent === '✓ Checked') continue;
+      await checkFact(i);
+      // Brief pause between calls to avoid rate limits
+      await sleep(600);
+    }
+
+    btn.innerHTML = '✅ All Checked';
+    btn.disabled  = false;
+    checkAllRunning = false;
+  }
+
+  // ─── Stats ─────────────────────────────────────────────────────────────────
+  function resetStats() {
+    stats.real = 0; stats.uncertain = 0; stats.fake = 0; stats.scores = [];
+    document.getElementById('stats-bar').classList.remove('visible');
+    updateStatsUI();
+  }
+
+  function updateStats(data) {
+    stats.scores.push(data.score);
+    if (data.verdict === 'Likely Real')  stats.real++;
+    else if (data.verdict === 'Likely Fake') stats.fake++;
+    else stats.uncertain++;
+    document.getElementById('stats-bar').classList.add('visible');
+    updateStatsUI();
+  }
+
+  function updateStatsUI() {
+    const avg = stats.scores.length
+      ? Math.round(stats.scores.reduce((a, b) => a + b, 0) / stats.scores.length)
+      : '—';
+    document.getElementById('stat-avg').textContent  = avg;
+    document.getElementById('stat-real').textContent = stats.real;
+    document.getElementById('stat-unc').textContent  = stats.uncertain;
+    document.getElementById('stat-fake').textContent = stats.fake;
+    document.getElementById('stat-checked').textContent = stats.scores.length;
+  }
+
+  // ─── Helpers ───────────────────────────────────────────────────────────────
   function setSearch(topic) {
     document.getElementById('search-input').value = topic;
     fetchNews();
   }
 
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
   function formatDate(d) {
-    const now = new Date();
+    const now  = new Date();
     const diff = Math.floor((now - d) / 1000);
-    if (diff < 60) return 'Just now';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 60)    return 'Just now';
+    if (diff < 3600)  return `${Math.floor(diff / 60)}m ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
   function escHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // Fetch on Enter key
+  // Enter key to search
   document.getElementById('search-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') fetchNews();
   });
 
-  // Auto-load top stories on page load
+  // Auto-load on page open
   window.addEventListener('load', fetchNews);
 </script>
-
 </body>
 </html>
